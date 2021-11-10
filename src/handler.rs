@@ -3,10 +3,7 @@ use crate::{
 };
 use serenity::{
     async_trait,
-    builder::{
-        CreateApplicationCommand, CreateApplicationCommandPermissionsData,
-        CreateApplicationCommands,
-    },
+    builder::{CreateApplicationCommand, CreateApplicationCommandPermissionsData},
     client::Context,
     model::{id::GuildId, interactions::application_command::ApplicationCommandInteraction},
     Result,
@@ -26,12 +23,12 @@ pub trait SlashCommandHandler: Sized + Send + Sync {
     where
         F: FnOnce(&mut SlashCommandBuilder) -> &mut SlashCommandBuilder;
 
-    async fn create_application_commands(&mut self, ctx: &Context) -> Result<()>;
+    async fn create_application_commands(&self, ctx: &Context) -> Result<()>;
 
     async fn create_application_command(
-        &mut self,
+        &self,
         ctx: &Context,
-        cmd: SlashCommandEntry,
+        cmd: &SlashCommandEntry,
     ) -> Result<()> {
         if cmd.guilds.is_some() {
             self.create_guild_command(ctx, cmd).await
@@ -40,7 +37,7 @@ pub trait SlashCommandHandler: Sized + Send + Sync {
         }
     }
 
-    async fn create_guild_command(&mut self, ctx: &Context, cmd: SlashCommandEntry) -> Result<()> {
+    async fn create_guild_command(&self, ctx: &Context, cmd: &SlashCommandEntry) -> Result<()> {
         for &guild_id in cmd.guilds.unwrap() {
             let guild_id = GuildId(guild_id);
 
@@ -63,7 +60,7 @@ pub trait SlashCommandHandler: Sized + Send + Sync {
         Ok(())
     }
 
-    async fn create_global_command(&mut self, ctx: &Context, cmd: SlashCommandEntry) -> Result<()>;
+    async fn create_global_command(&self, ctx: &Context, cmd: &SlashCommandEntry) -> Result<()>;
 
     async fn interaction_create(
         &self,
@@ -90,7 +87,6 @@ pub struct SlashCommandEntry {
 
 pub struct DefaultSlashCommandHandler {
     to_add: Option<Vec<SlashCommandEntry>>,
-    globals: Option<CreateApplicationCommands>,
     callbacks: Mutex<HashMap<&'static str, SlashCommandCallback>>,
 }
 
@@ -118,8 +114,8 @@ impl SlashCommandHandler for DefaultSlashCommandHandler {
         self
     }
 
-    async fn create_application_commands(&mut self, ctx: &Context) -> Result<()> {
-        let to_add = match self.to_add.take() {
+    async fn create_application_commands(&self, ctx: &Context) -> Result<()> {
+        let to_add = match self.to_add.as_ref() {
             Some(t) => t,
             None => return Ok(()),
         };
@@ -131,19 +127,8 @@ impl SlashCommandHandler for DefaultSlashCommandHandler {
         Ok(())
     }
 
-    async fn create_global_command(
-        &mut self,
-        _ctx: &Context,
-        cmd: SlashCommandEntry,
-    ) -> Result<()> {
-        let globals = match self.globals.as_mut() {
-            Some(g) => g,
-            None => return Ok(()),
-        };
-
-        globals.add_application_command(cmd.create);
-
-        Ok(())
+    async fn create_global_command(&self, _ctx: &Context, _cmd: &SlashCommandEntry) -> Result<()> {
+        todo!()
     }
 }
 
@@ -151,7 +136,6 @@ impl Default for DefaultSlashCommandHandler {
     fn default() -> Self {
         Self {
             to_add: Some(Default::default()),
-            globals: Some(Default::default()),
             callbacks: Default::default(),
         }
     }
