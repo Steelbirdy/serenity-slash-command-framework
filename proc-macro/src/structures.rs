@@ -132,6 +132,7 @@ pub struct Options {
     pub guild_ids: Vec<u64>,
     pub default_permission: bool,
     pub permissions: Vec<Ident>,
+    pub options: Vec<Ident>,
 }
 
 impl Options {

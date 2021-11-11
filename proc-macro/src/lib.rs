@@ -51,6 +51,10 @@ pub fn slash_command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 let permission_name: Ident = propagate_err!(attributes::parse(values));
                 options.permissions.push(permission_name);
             }
+            "option" => {
+                let option_name: Ident = propagate_err!(attributes::parse(values));
+                options.options.push(option_name);
+            }
             _ => {
                 return Error::new(span, format_args!("invalid attribute: {:?}", attr))
                     .to_compile_error()
@@ -64,6 +68,7 @@ pub fn slash_command(attr: TokenStream, input: TokenStream) -> TokenStream {
         guild_ids,
         default_permission,
         permissions,
+        options,
     } = options;
 
     propagate_err!(create_declaration_validations(&mut fun));
@@ -108,17 +113,13 @@ pub fn slash_command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let create_function = quote! {
         fn create(c: &mut #create_application_command_path) -> &mut #create_application_command_path {
             #create_function
+                #(.create_option(|o| #options::apply(o)))*
         }
     };
 
-    let mut permission_function = quote! {};
-
-    for permission in permissions {
-        permission_function = quote! {
-            #permission_function
-            #permission::apply(p);
-        };
-    }
+    let mut permission_function = quote! {
+        #(#permissions::apply(p);)*
+    };
 
     if !permission_function.is_empty() {
         permission_function = quote! {

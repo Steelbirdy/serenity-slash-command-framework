@@ -22,7 +22,7 @@ impl EventHandler for Handler {
 
         info!("Initializing slash commands...");
         if let Err(why) = self.create_application_commands(&ctx).await {
-            error!("Error while creating slash commands: {}", why);
+            error!("Error while creating slash commands: {:#?}", why);
         }
         info!("Done initializing slash commands.");
     }
@@ -38,7 +38,7 @@ impl EventHandler for Handler {
                 .interaction_create(&ctx, &interaction)
                 .await
             {
-                error!("Error while executing slash command: {}", why);
+                error!("Error while executing slash command: {:#?}", why);
             }
         }
     }
