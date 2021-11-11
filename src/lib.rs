@@ -1,11 +1,13 @@
 mod builder;
 mod error;
+mod ext;
 mod handler;
 #[macro_use]
 mod macros;
 
 pub use builder::SlashCommandBuilder;
 pub use error::SlashCommandError;
+pub use ext::ApplicationCommandInteractionExt;
 pub use handler::{DefaultSlashCommandHandler, SlashCommandEntry, SlashCommandHandler};
 
 pub use proc_macro::slash_command;

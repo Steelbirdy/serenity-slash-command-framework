@@ -49,9 +49,7 @@ async fn main() {
     let framework = StandardFramework::new().configure(|c| c.owners(owners).prefix(&prefix));
 
     let mut handler = handler::Handler::default();
-    handler
-        .register_slash_command::<QUIT_COMMAND>()
-        .await;
+    handler.register_slash_command::<QUIT_COMMAND>().await;
 
     let application_id: u64 = std::env::var("APPLICATION_ID")
         .expect("Expected an application id in the environment. Add the `APPLICATION_ID` key to the .env file")
