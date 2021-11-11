@@ -1,19 +1,27 @@
 [package]
-name = "serenity-slash-command-framework"
+name = "quit"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-proc-macro = { path = "proc-macro" }
-
-thiserror = "^1.0.30"
+dotenv = "^0.15.0"
+lazy_static = "^1.4.0"
+rand = "^0.8.4"
+tracing = "^0.1.29"
 
 [dependencies.serenity]
 version = "^0.10.9"
 features = ["collector", "model", "unstable_discord_api"]
 
+[dependencies.serenity-slash-command-framework]
+path = "../.."
+
 [dependencies.tokio]
-version = "^1.12.0"
+version = "^1.13.0"
 features = ["macros", "rt-multi-thread"]
+
+[dependencies.tracing-subscriber]
+version = "^0.3.1"
+features = ["env-filter"]

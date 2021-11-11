@@ -1,10 +1,14 @@
 mod builder;
 mod error;
 mod handler;
+#[macro_use]
+mod macros;
 
 pub use builder::SlashCommandBuilder;
 pub use error::SlashCommandError;
 pub use handler::{DefaultSlashCommandHandler, SlashCommandEntry, SlashCommandHandler};
+
+pub use proc_macro::slash_command;
 
 use serenity::{
     async_trait,
